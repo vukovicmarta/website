@@ -2320,6 +2320,19 @@ input, select, textarea {
 					letter-spacing: 0;
 				}
 
+		/* Override button styles for the white box */
+.button.large.white-box {
+    text-align: center;
+    font-size: 1.2em;
+    width: auto; /* Adjust width as needed */
+    padding: 10px 20px;
+    background-color: white;
+    color: black;
+    border: 2px solid black;
+    border-radius: 5px;
+}
+
+
 		/* Social */
 
 			ul.social {
