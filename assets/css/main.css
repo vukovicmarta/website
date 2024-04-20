@@ -1937,6 +1937,15 @@ input, select, textarea {
 			width: auto;
 		}
 
+.white-box {
+    background-color: white;
+    color: black;
+    border: 2px solid black; /* Optional: Add border for emphasis */
+    padding: 10px 20px; /* Adjust padding as needed */
+    border-radius: 5px; /* Optional: Add rounded corners */
+}
+
+
 /* Icons */
 
 	.icon {
