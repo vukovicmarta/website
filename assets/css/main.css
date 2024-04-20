@@ -1937,14 +1937,6 @@ input, select, textarea {
 			width: auto;
 		}
 
-/* Add custom styles for the white box button */
-.white-box {
-    background-color: white !important;
-    color: black !important;
-    border: 1px black !important;
-    padding: 1em 1em !important;
-    border-radius: 2px !important;
-}
 
 
 /* Icons */
@@ -2320,17 +2312,6 @@ input, select, textarea {
 					letter-spacing: 0;
 				}
 
-		/* Override button styles for the white box */
-.button.large.white-box {
-    text-align: center;
-    font-size: 1.2em;
-    width: auto; /* Adjust width as needed */
-    padding: 1em 1em;
-    background-color: white;
-    color: black;
-    border: 1px black;
-    border-radius: 2px;
-}
 
 
 		/* Social */
