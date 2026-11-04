@@ -1,0 +1,52 @@
+:root{
+  --ink:#1f2933; --muted:#5f6c7b; --accent:#1f4e79; --accent-dark:#163a5c;
+  --accent-soft:#e8eff6; --bg:#ffffff; --bg-alt:#f6f5f2; --line:#e3e0d8;
+}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased;}
+h1,h2,h3{font-family:'Source Serif 4',Georgia,serif;color:var(--ink);text-transform:none;letter-spacing:-0.01em;}
+
+/* Nav */
+#nav{background:rgba(255,255,255,.92)!important;backdrop-filter:blur(8px);border-bottom:1px solid var(--line);}
+#nav a{color:var(--muted)!important;font-weight:500;font-size:.8em;letter-spacing:.08em;text-transform:uppercase;}
+#nav a:hover,#nav a.active{color:var(--accent)!important;}
+
+/* Sections: strict alternation, independent of the styleN classes */
+article.wrapper{padding:5em 0!important;color:var(--ink)!important;}
+article.wrapper:nth-of-type(odd){background:var(--bg)!important;}
+article.wrapper:nth-of-type(even){background:var(--bg-alt)!important;}
+#cv{padding:2.5em 0!important;}
+#cv .box{background:transparent;box-shadow:none;padding:0;text-align:center;}
+
+/* Section headings */
+article.wrapper header{text-align:left;}
+article.wrapper header h2{font-size:1.9em;margin-bottom:1.4em;padding-bottom:.5em;position:relative;}
+article.wrapper header h2::after{content:"";position:absolute;left:0;bottom:0;width:48px;height:3px;background:var(--accent);border-radius:2px;}
+
+/* Home */
+#home .row{align-items:center;}
+#home h1{font-size:2.8em;margin-bottom:.4em;}
+#home .image img{border-radius:14px;box-shadow:0 10px 30px rgba(31,41,51,.15);}
+.photo-credit{font-size:.75em;color:var(--muted);margin-top:.6em;}
+
+/* Links (not buttons) */
+article.wrapper p a:not(.button){color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(31,78,121,.3);}
+article.wrapper p a:not(.button):hover{border-bottom-color:var(--accent);}
+
+/* Buttons */
+.button.primary{background:var(--accent)!important;color:#fff!important;border:0;border-radius:999px;box-shadow:none;padding:0 2em;}
+.button.primary:hover{background:var(--accent-dark)!important;}
+
+/* Entries as cards (replaces the inline <style> block) */
+.publication,.working-paper,.policy-reports p{
+  background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,.04);
+  padding:1.1em 1.3em;text-indent:0;margin-bottom:1em;line-height:1.55;color:var(--ink);
+}
+
+/* Status pills */
+.tag{display:inline-block;font-size:.7em;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+  padding:.15em .65em;border-radius:999px;background:var(--accent-soft);color:var(--accent);margin-right:.6em;vertical-align:middle;}
+
+/* Footer */
+#copyright{color:var(--muted);font-size:.8em;}
