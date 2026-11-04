@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Play | Marta Vukovic</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/custom.css" />
+</head>
+<body>
+
+<nav id="nav"><ul>
+  <li><a href="index.html">Home</a></li>
+  <li><a href="research.html">Research</a></li>
+  <li><a href="play.html" class="active">Play</a></li>
+  <li><a href="cv_vukovic_may_2026.pdf" target="_blank" rel="noopener">CV</a></li>
+  <li><a href="#contact">Contact</a></li>
+</ul></nav>
+
+<div class="band"><div class="wrap">
+  <h2>A mini-experiment</h2>
+  <div class="game">
+    <div id="intro">
+      <p>Eight quick rounds, two candidates each. Pick the one you'd vote for. First, which economic position is closer to yours?</p>
+      <button class="btn" data-pref="a">Higher taxes on high incomes</button>
+      <button class="btn" data-pref="b">Lower taxes on high incomes</button>
+    </div>
+    <div id="play" hidden>
+      <p class="meter" id="round"></p>
+      <div class="cands" id="cands"></div>
+    </div>
+    <div id="result" hidden></div>
+  </div>
+  <p class="small">An illustration of the logic of a conjoint experiment, not a real study. Nothing you click is stored or sent anywhere.</p>
+</div></div>
+
+<div class="band alt" id="contact"><div class="wrap">
+  <h2>Get in touch</h2>
+  <p>E-mail: <a href="mailto:marta.vukovic@univie.ac.at">marta.vukovic@univie.ac.at</a></p>
+  <p>Social media: <a href="https://bsky.app/profile/martav.bsky.social">Bluesky</a> | <a href="https://www.linkedin.com/in/vukovicmarta/">LinkedIn</a></p>
+  <p class="small">&copy; 2026 Marta Vukovic. All rights reserved.</p>
+</div></div>
+
+<script>
+(function(){
+  var ACTS=["Ignores a ruling of the constitutional court","Pressures critical media outlets","Bans a peaceful opposition protest","Packs the courts with loyalists"];
+  var STANCE={a:"Wants higher taxes on high incomes",b:"Wants lower taxes on high incomes"};
+  var pref,rounds,i,log,cur;
+  function $(id){return document.getElementById(id);}
+  function shuffle(a){for(var k=a.length-1;k>0;k--){var j=Math.floor(Math.random()*(k+1));var t=a[k];a[k]=a[j];a[j]=t;}return a;}
+  function rand(a){return a[Math.floor(Math.random()*a.length)];}
+  function card(c,label,idx){
+    return '<div class="cand"><h3>'+label+'</h3><ul><li><b>Economy:</b> '+c.stance+'</li><li><b>In office:</b> '+(c.act||'Respects all democratic rules')+'</li></ul><button class="btn" data-idx="'+idx+'">Vote for '+label+'</button></div>';
+  }
+  function show(){
+    var r=rounds[i];
+    var own={stance:STANCE[pref],act:r[0]?rand(ACTS):null,own:true};
+    var other={stance:STANCE[pref==='a'?'b':'a'],act:r[1]?rand(ACTS):null,own:false};
+    cur=Math.random()<.5?[own,other]:[other,own];
+    $('round').textContent='Round '+(i+1)+' of '+rounds.length;
+    $('cands').innerHTML=card(cur[0],'Candidate A',0)+card(cur[1],'Candidate B',1);
+  }
+  function finish(){
+    var tr=log.filter(function(r){return r.ov&&!r.xv;});
+    var stuck=tr.filter(function(r){return r.pickedOwn;}).length;
+    var viol=log.filter(function(r){return r.pickedViolator;}).length;
+    $('play').hidden=true; $('result').hidden=false;
+    $('result').innerHTML='<h3>Debrief</h3>'+
+      '<p>You chose a candidate who broke a democratic rule in <b>'+viol+' of '+log.length+'</b> rounds.</p>'+
+      '<p>In the <b>'+tr.length+'</b> rounds where the candidate on your economic side broke a rule and the other side did not, you stayed with your side <b>'+stuck+'</b> times.</p>'+
+      '<p>Because the rule-breaking was randomly assigned, comparing choices across those rounds is what lets researchers separate how much people care about democratic rules from how much they care about policy. That is the logic behind conjoint designs.</p>'+
+      '<button class="btn" id="again">Play again</button>';
+    $('again').onclick=function(){$('result').hidden=true;$('intro').hidden=false;};
+  }
+  document.querySelectorAll('[data-pref]').forEach(function(b){
+    b.onclick=function(){
+      pref=b.getAttribute('data-pref');
+      rounds=shuffle([[1,0],[1,0],[1,0],[0,1],[0,1],[1,1],[0,0],[0,0]]);
+      i=0; log=[]; $('intro').hidden=true; $('play').hidden=false; show();
+    };
+  });
+  $('cands').addEventListener('click',function(e){
+    var b=e.target.closest('button[data-idx]'); if(!b) return;
+    var p=cur[+b.getAttribute('data-idx')];
+    var own=cur[0].own?cur[0]:cur[1], other=cur[0].own?cur[1]:cur[0];
+    log.push({ov:!!own.act,xv:!!other.act,pickedOwn:p.own,pickedViolator:!!p.act});
+    i++; if(i<rounds.length) show(); else finish();
+  });
+})();
+</script>
+</body>
+</html>
