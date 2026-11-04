@@ -23,15 +23,27 @@
 <div class="band"><div class="wrap">
   <h2>A mini-experiment</h2>
   <div class="game">
+
     <div id="intro">
-      <p>Eight quick rounds, two candidates each. Pick the one you'd vote for. First, which economic position is closer to yours?</p>
-      <button class="btn" data-pref="a">Higher taxes on high incomes</button>
-      <button class="btn" data-pref="b">Lower taxes on high incomes</button>
+      <p>Ten quick rounds, two candidates each. Pick the one you would vote for. First, tell us where you stand.</p>
+      <p><b>Economic policy</b></p>
+      <p>
+        <button class="btn ghost" data-q="e" data-v="a">Higher taxes on high incomes</button>
+        <button class="btn ghost" data-q="e" data-v="b">Lower taxes on high incomes</button>
+      </p>
+      <p><b>Cultural policy</b></p>
+      <p>
+        <button class="btn ghost" data-q="c" data-v="a">More liberal: easier immigration, expanded minority rights</button>
+        <button class="btn ghost" data-q="c" data-v="b">More traditional: stricter immigration, traditional family values</button>
+      </p>
+      <p><button class="btn" id="start" disabled style="opacity:.4">Start</button></p>
     </div>
+
     <div id="play" hidden>
       <p class="meter" id="round"></p>
       <div class="cands" id="cands"></div>
     </div>
+
     <div id="result" hidden></div>
   </div>
   <p class="small">An illustration of the logic of a conjoint experiment, not a real study. Nothing you click is stored or sent anywhere.</p>
@@ -46,48 +58,87 @@
 
 <script>
 (function(){
-  var ACTS=["Ignores a ruling of the constitutional court","Pressures critical media outlets","Bans a peaceful opposition protest","Packs the courts with loyalists"];
-  var STANCE={a:"Wants higher taxes on high incomes",b:"Wants lower taxes on high incomes"};
-  var pref,rounds,i,log,cur;
+  var ECON={a:"Wants higher taxes on high incomes",b:"Wants lower taxes on high incomes"};
+  var CULT={a:"Favors easier immigration and expanded minority rights",b:"Favors stricter immigration and traditional family values"};
+  var CORR=[
+    "Reported to have steered public contracts to a company owned by a relative",
+    "Accused of accepting cash from lobbyists in exchange for favorable votes",
+    "Found to have used party funds for private holidays",
+    "Reported to have given well-paid state jobs to friends and donors"
+  ];
+  var ROUNDS=10;
+  var pref={e:null,c:null}, i, seen, cur;
+
   function $(id){return document.getElementById(id);}
-  function shuffle(a){for(var k=a.length-1;k>0;k--){var j=Math.floor(Math.random()*(k+1));var t=a[k];a[k]=a[j];a[j]=t;}return a;}
   function rand(a){return a[Math.floor(Math.random()*a.length)];}
-  function card(c,label,idx){
-    return '<div class="cand"><h3>'+label+'</h3><ul><li><b>Economy:</b> '+c.stance+'</li><li><b>In office:</b> '+(c.act||'Respects all democratic rules')+'</li></ul><button class="btn" data-idx="'+idx+'">Vote for '+label+'</button></div>';
+  function profile(){
+    return {e:rand(['a','b']), c:rand(['a','b']), corr:(Math.random()<.5?null:rand(CORR))};
+  }
+  function same(p,q){return p.e===q.e && p.c===q.c && p.corr===q.corr;}
+  function card(p,label,idx){
+    return '<div class="cand"><h3>'+label+'</h3><ul>'+
+      '<li><b>Economy:</b> '+ECON[p.e]+'</li>'+
+      '<li><b>Culture:</b> '+CULT[p.c]+'</li>'+
+      '<li><b>Integrity:</b> '+(p.corr||'No corruption allegations')+'</li>'+
+      '</ul><button class="btn" data-idx="'+idx+'">Vote for '+label+'</button></div>';
   }
   function show(){
-    var r=rounds[i];
-    var own={stance:STANCE[pref],act:r[0]?rand(ACTS):null,own:true};
-    var other={stance:STANCE[pref==='a'?'b':'a'],act:r[1]?rand(ACTS):null,own:false};
-    cur=Math.random()<.5?[own,other]:[other,own];
-    $('round').textContent='Round '+(i+1)+' of '+rounds.length;
-    $('cands').innerHTML=card(cur[0],'Candidate A',0)+card(cur[1],'Candidate B',1);
+    var p,q;
+    do{ p=profile(); q=profile(); }while(same(p,q));
+    cur=[p,q];
+    $('round').textContent='Round '+(i+1)+' of '+ROUNDS;
+    $('cands').innerHTML=card(p,'Candidate A',0)+card(q,'Candidate B',1);
+  }
+  function rate(list){
+    if(!list.length) return null;
+    return Math.round(100*list.filter(function(x){return x.chosen;}).length/list.length);
+  }
+  function row(label,pct,n){
+    var txt=(pct===null)?'n/a':pct+'%';
+    var w=(pct===null)?0:pct;
+    return '<p style="margin:.2em 0 .1em">'+label+': <b>'+txt+'</b> <span class="small">(of '+n+' profiles shown)</span></p>'+
+      '<div style="background:#e8eff6;border-radius:6px;height:10px;margin-bottom:.9em"><div style="background:#1f4e79;width:'+w+'%;height:10px;border-radius:6px"></div></div>';
   }
   function finish(){
-    var tr=log.filter(function(r){return r.ov&&!r.xv;});
-    var stuck=tr.filter(function(r){return r.pickedOwn;}).length;
-    var viol=log.filter(function(r){return r.pickedViolator;}).length;
+    var econM=seen.filter(function(x){return x.econMatch;}), econN=seen.filter(function(x){return !x.econMatch;});
+    var cultM=seen.filter(function(x){return x.cultMatch;}), cultN=seen.filter(function(x){return !x.cultMatch;});
+    var corr=seen.filter(function(x){return x.corrupt;}), clean=seen.filter(function(x){return !x.corrupt;});
     $('play').hidden=true; $('result').hidden=false;
     $('result').innerHTML='<h3>Debrief</h3>'+
-      '<p>You chose a candidate who broke a democratic rule in <b>'+viol+' of '+log.length+'</b> rounds.</p>'+
-      '<p>In the <b>'+tr.length+'</b> rounds where the candidate on your economic side broke a rule and the other side did not, you stayed with your side <b>'+stuck+'</b> times.</p>'+
-      '<p>Because the rule-breaking was randomly assigned, comparing choices across those rounds is what lets researchers separate how much people care about democratic rules from how much they care about policy. That is the logic behind conjoint designs.</p>'+
+      '<p>Share of times you picked a candidate, by candidate characteristic:</p>'+
+      row('Shares your economic position',rate(econM),econM.length)+
+      row('Opposes your economic position',rate(econN),econN.length)+
+      row('Shares your cultural position',rate(cultM),cultM.length)+
+      row('Opposes your cultural position',rate(cultN),cultN.length)+
+      row('Clean record',rate(clean),clean.length)+
+      row('Corruption allegation',rate(corr),corr.length)+
+      '<p>Every characteristic was randomly assigned, independently of the others. That is what lets researchers compare these rates and isolate how much each attribute matters, rather than confusing, say, corruption with policy stance. With only ten rounds your numbers are noisy; real conjoint studies average over thousands of choices.</p>'+
       '<button class="btn" id="again">Play again</button>';
     $('again').onclick=function(){$('result').hidden=true;$('intro').hidden=false;};
   }
-  document.querySelectorAll('[data-pref]').forEach(function(b){
-    b.onclick=function(){
-      pref=b.getAttribute('data-pref');
-      rounds=shuffle([[1,0],[1,0],[1,0],[0,1],[0,1],[1,1],[0,0],[0,0]]);
-      i=0; log=[]; $('intro').hidden=true; $('play').hidden=false; show();
-    };
+
+  // Intro: select positions, enable Start
+  $('intro').addEventListener('click',function(e){
+    var b=e.target.closest('button[data-q]'); if(!b) return;
+    var q=b.getAttribute('data-q');
+    pref[q]=b.getAttribute('data-v');
+    document.querySelectorAll('button[data-q="'+q+'"]').forEach(function(x){
+      x.className = (x===b) ? 'btn' : 'btn ghost';
+    });
+    if(pref.e && pref.c){ $('start').disabled=false; $('start').style.opacity=1; }
   });
+  $('start').onclick=function(){
+    i=0; seen=[]; $('intro').hidden=true; $('play').hidden=false; show();
+  };
+
+  // Voting
   $('cands').addEventListener('click',function(e){
     var b=e.target.closest('button[data-idx]'); if(!b) return;
-    var p=cur[+b.getAttribute('data-idx')];
-    var own=cur[0].own?cur[0]:cur[1], other=cur[0].own?cur[1]:cur[0];
-    log.push({ov:!!own.act,xv:!!other.act,pickedOwn:p.own,pickedViolator:!!p.act});
-    i++; if(i<rounds.length) show(); else finish();
+    var pick=+b.getAttribute('data-idx');
+    cur.forEach(function(p,k){
+      seen.push({econMatch:p.e===pref.e, cultMatch:p.c===pref.c, corrupt:!!p.corr, chosen:k===pick});
+    });
+    i++; if(i<ROUNDS) show(); else finish();
   });
 })();
 </script>
