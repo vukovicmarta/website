@@ -100,3 +100,22 @@ h1,h2,h3{letter-spacing:0;font-weight:600;}
 
 /* Plainer hero */
 .band.hero{background-image:none;}
+
+
+
+/* ===== Lilac palette ===== */
+:root{
+  --accent:#5b3cc4;        /* deep violet: buttons, links, borders */
+  --hover:#c9b8fa;         /* bright lilac: hover backgrounds */
+  --hover-soft:#f1ecfd;    /* pale lilac: entry/card hover */
+  --accent-soft:#f3effd;   /* pale lilac: tags */
+  --bg-alt:#f8f6fc;        /* faint lilac band */
+  --line:#e6e1f0;
+}
+
+/* Hover states: dark text on bright lilac (white would be hard to read) */
+#nav a:hover,#nav a.active{background:var(--hover)!important;color:var(--ink)!important;}
+.btn:hover,.btn.ghost:hover{background:var(--hover);color:var(--ink)!important;}
+
+/* Link underlines */
+.wrap p a:not(.btn){border-bottom-color:rgba(91,60,196,.35);}
