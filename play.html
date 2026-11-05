@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="assets/css/main.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/custom.css" />
 </head>
 <body>
@@ -17,7 +17,7 @@
   <li><a href="research.html">Research</a></li>
   <li><a href="play.html" class="active">Play</a></li>
   <li><a href="cv_vukovic_may_2026.pdf" target="_blank" rel="noopener">CV</a></li>
-  <li><a href="#contact">Contact</a></li>
+  <li><a href="contact.html">Contact</a></li>
 </ul></nav>
 
 <div class="band"><div class="wrap">
@@ -28,8 +28,8 @@
       <p>Ten quick rounds, two candidates each. Pick the one you would vote for. First, tell us where you stand.</p>
       <p><b>Economic policy</b></p>
       <p>
-        <button class="btn ghost" data-q="e" data-v="a">Higher taxes for the rich </button>
-        <button class="btn ghost" data-q="e" data-v="b">Lower taxes for the rich</button>
+        <button class="btn ghost" data-q="e" data-v="a">Higher taxes on the rich</button>
+        <button class="btn ghost" data-q="e" data-v="b">Lower taxes on the rich</button>
       </p>
       <p><b>Cultural policy</b></p>
       <p>
@@ -49,17 +49,12 @@
   <p class="small">An illustration of the logic of a conjoint experiment, not a real study. Nothing you click is stored or sent anywhere.</p>
 </div></div>
 
-<div class="band alt" id="contact"><div class="wrap">
-  <h2>Get in touch</h2>
-  <p>E-mail: <a href="mailto:marta.vukovic@univie.ac.at">marta.vukovic@univie.ac.at</a></p>
-  <p>Social media: <a href="https://bsky.app/profile/martav.bsky.social">Bluesky</a> | <a href="https://www.linkedin.com/in/vukovicmarta/">LinkedIn</a></p>
-  <p class="small">&copy; 2026 Marta Vukovic. All rights reserved.</p>
-</div></div>
+<footer class="site-foot"><div class="wrap"><p class="small">&copy; 2026 Marta Vukovic. All rights reserved.</p></div></footer>
 
 <script>
 (function(){
-  var ECON={a:"Wants higher taxes for the rich",b:"Wants lower taxes for the rich"};
-  var CULT={a:"Favors easier immigration and expanded minority rights",b:"Favors stricter immigration rules"};
+  var ECON={a:"Wants higher taxes on high incomes",b:"Wants lower taxes on high incomes"};
+  var CULT={a:"Favors easier immigration and expanded minority rights",b:"Favors stricter immigration and traditional family values"};
   var CORR=[
     "Reported to have steered public contracts to a company owned by a relative",
     "Accused of accepting cash from lobbyists in exchange for favorable votes",
@@ -97,7 +92,7 @@
     var txt=(pct===null)?'n/a':pct+'%';
     var w=(pct===null)?0:pct;
     return '<p style="margin:.2em 0 .1em">'+label+': <b>'+txt+'</b> <span class="small">(of '+n+' profiles shown)</span></p>'+
-      '<div style="background:#e8eff6;border-radius:6px;height:10px;margin-bottom:.9em"><div style="background:#1f4e79;width:'+w+'%;height:10px;border-radius:6px"></div></div>';
+      '<div style="background:#f3effd;height:10px;margin-bottom:.9em"><div style="background:#5b3cc4;width:'+w+'%;height:10px"></div></div>';
   }
   function finish(){
     var econM=seen.filter(function(x){return x.econMatch;}), econN=seen.filter(function(x){return !x.econMatch;});
@@ -117,7 +112,6 @@
     $('again').onclick=function(){$('result').hidden=true;$('intro').hidden=false;};
   }
 
-  // Intro: select positions, enable Start
   $('intro').addEventListener('click',function(e){
     var b=e.target.closest('button[data-q]'); if(!b) return;
     var q=b.getAttribute('data-q');
@@ -131,7 +125,6 @@
     i=0; seen=[]; $('intro').hidden=true; $('play').hidden=false; show();
   };
 
-  // Voting
   $('cands').addEventListener('click',function(e){
     var b=e.target.closest('button[data-idx]'); if(!b) return;
     var pick=+b.getAttribute('data-idx');
@@ -142,5 +135,6 @@
   });
 })();
 </script>
+<script src="assets/js/cursor.js"></script>
 </body>
 </html>
