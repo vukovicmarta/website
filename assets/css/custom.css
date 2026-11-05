@@ -118,3 +118,39 @@ h1,h2,h3{letter-spacing:0;font-weight:600;}
 
 /* Link underlines */
 .wrap p a:not(.btn){border-bottom-color:rgba(91,60,196,.35);}
+
+
+/* ===== Final touches ===== */
+:root{--deep:#43289c;}
+
+/* Nav: deep purple text and arrow */
+#nav a{color:var(--deep)!important;}
+#nav a:hover,#nav a.active{background:var(--hover)!important;color:var(--deep)!important;}
+#nav a:before,#nav a:after{color:var(--deep)!important;border-top-color:var(--deep)!important;}
+
+/* Profile photo: lilac wash on hover */
+.photo-frame{position:relative;overflow:hidden;line-height:0;}
+.photo-frame::after{content:"";position:absolute;inset:0;background:rgba(182,156,247,.5);
+opacity:0;transition:opacity .3s;pointer-events:none;}
+.photo-frame:hover::after{opacity:1;}
+
+/* Contact page */
+.contact-list{list-style:none;margin:1.5em 0 0;padding:0;}
+.contact-list li{margin:0 0 1.1em;}
+.contact-list a{display:inline-flex;align-items:center;gap:.9em;color:var(--ink);text-decoration:none;
+border:0!important;font-family:var(--mono);font-size:.95em;transition:color .2s;}
+.contact-list svg{width:24px;height:24px;flex:none;fill:currentColor;}
+.contact-list svg.line{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.contact-list a:hover{color:var(--accent);}
+
+/* Slim footer (replaces the old contact band) */
+.site-foot{padding:1.6em 0;border-top:1px solid var(--line);}
+.site-foot .small{margin:0;}
+
+/* Custom cursor (only active when cursor.js runs) */
+.custom-cursor,.custom-cursor *{cursor:none!important;}
+.cur-dot,.cur-ring{position:fixed;top:0;left:0;pointer-events:none;z-index:9999;border-radius:50%;transition:opacity .2s;}
+.cur-dot{width:8px;height:8px;margin:-4px 0 0 -4px;background:var(--accent);}
+.cur-ring{width:34px;height:34px;margin:-17px 0 0 -17px;border:1.5px solid var(--accent);
+transition:width .2s,height .2s,margin .2s,background .2s,opacity .2s;}
+.cur-ring.hot{width:54px;height:54px;margin:-27px 0 0 -27px;background:rgba(201,184,250,.4);}
