@@ -9,6 +9,38 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/custom.css" />
+  <style>
+    /* Game buttons: solid, legible, wrapping text */
+    html body .game .btn{
+      display:inline-block;white-space:normal;text-align:left;text-transform:none;letter-spacing:0;
+      font-size:.85em;line-height:1.4;height:auto;padding:.7em 1.2em;margin:0 .6em .6em 0;
+      border-radius:0;box-shadow:none;text-shadow:none;opacity:1;
+      background:#5b3cc4;color:#fff !important;border:1px solid #5b3cc4;
+      transition:background .2s,color .2s,border-color .2s;
+    }
+    html body .game .btn.ghost{background:#f6f5f9;color:#43289c !important;border:1px solid #5b3cc4;}
+    html body .game .btn:hover,
+    html body .game .btn.ghost:hover{background:#c9b8fa;color:#2a1a66 !important;border-color:#5b3cc4;}
+    html body .game .btn:disabled,
+    html body .game .btn:disabled:hover{background:#d9d4e8;color:#6b6385 !important;border-color:#d9d4e8;cursor:not-allowed;}
+
+    /* Candidate cards */
+    html body .game .cand{background:#f6f5f9;color:#1f2933;animation:rise .3s ease both;
+      transition:background .2s,border-color .2s,opacity .2s;}
+    html body .game .cand li{color:#1f2933;}
+    html body .game .cand.picked{background:#c9b8fa;border-color:#5b3cc4;}
+    html body .game .cand.dim{opacity:.45;}
+    @keyframes rise{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+    /* Progress bar */
+    .prog{height:3px;background:#ddd8ea;margin:.4em 0 1em;}
+    #progbar{height:3px;width:0;background:#5b3cc4;transition:width .35s ease;}
+
+    @media (prefers-reduced-motion:reduce){
+      html body .game .cand{animation:none;}
+      #progbar{transition:none;}
+    }
+  </style>
 </head>
 <body>
 
@@ -25,7 +57,7 @@
   <div class="game">
 
     <div id="intro">
-      <p>Ten quick rounds, two candidates each. Pick the one you would vote for. First, tell us where you stand.</p>
+      <p>Six quick rounds, two candidates each. Pick the one you would vote for. First, tell us where you stand.</p>
       <p><b>Economic policy</b></p>
       <p>
         <button class="btn ghost" data-q="e" data-v="a">Higher taxes on the rich</button>
@@ -36,11 +68,12 @@
         <button class="btn ghost" data-q="c" data-v="a">More liberal: easier immigration, expanded minority rights</button>
         <button class="btn ghost" data-q="c" data-v="b">More traditional: stricter immigration, traditional family values</button>
       </p>
-      <p><button class="btn" id="start" disabled style="opacity:.4">Start</button></p>
+      <p><button class="btn" id="start" disabled>Start</button></p>
     </div>
 
     <div id="play" hidden>
       <p class="meter" id="round"></p>
+      <div class="prog"><div id="progbar"></div></div>
       <div class="cands" id="cands"></div>
     </div>
 
@@ -53,7 +86,7 @@
 
 <script>
 (function(){
-  var ECON={a:"Wants higher taxes on high incomes",b:"Wants lower taxes on high incomes"};
+  var ECON={a:"Wants higher taxes on the rich",b:"Wants lower taxes on the rich"};
   var CULT={a:"Favors easier immigration and expanded minority rights",b:"Favors stricter immigration and traditional family values"};
   var CORR=[
     "Reported to have steered public contracts to a company owned by a relative",
@@ -61,8 +94,8 @@
     "Found to have used party funds for private holidays",
     "Reported to have given well-paid state jobs to friends and donors"
   ];
-  var ROUNDS=10;
-  var pref={e:null,c:null}, i, seen, cur;
+  var ROUNDS=6;
+  var pref={e:null,c:null}, i, seen, cur, busy=false;
 
   function $(id){return document.getElementById(id);}
   function rand(a){return a[Math.floor(Math.random()*a.length)];}
@@ -82,6 +115,7 @@
     do{ p=profile(); q=profile(); }while(same(p,q));
     cur=[p,q];
     $('round').textContent='Round '+(i+1)+' of '+ROUNDS;
+    $('progbar').style.width=(i/ROUNDS*100)+'%';
     $('cands').innerHTML=card(p,'Candidate A',0)+card(q,'Candidate B',1);
   }
   function rate(list){
@@ -107,11 +141,12 @@
       row('Opposes your cultural position',rate(cultN),cultN.length)+
       row('Clean record',rate(clean),clean.length)+
       row('Corruption allegation',rate(corr),corr.length)+
-      '<p>Every characteristic was randomly assigned, independently of the others. That is what lets researchers compare these rates and isolate how much each attribute matters, rather than confusing, say, corruption with policy stance. With only ten rounds your numbers are noisy; real conjoint studies average over thousands of choices.</p>'+
+      '<p>Every characteristic was randomly assigned, independently of the others. That is what lets researchers compare these rates and isolate how much each attribute matters, rather than confusing, say, corruption with policy stance. With only six rounds your numbers are noisy; real conjoint studies average over thousands of choices.</p>'+
       '<button class="btn" id="again">Play again</button>';
     $('again').onclick=function(){$('result').hidden=true;$('intro').hidden=false;};
   }
 
+  // Intro: choose positions, enable Start
   $('intro').addEventListener('click',function(e){
     var b=e.target.closest('button[data-q]'); if(!b) return;
     var q=b.getAttribute('data-q');
@@ -119,20 +154,33 @@
     document.querySelectorAll('button[data-q="'+q+'"]').forEach(function(x){
       x.className = (x===b) ? 'btn' : 'btn ghost';
     });
-    if(pref.e && pref.c){ $('start').disabled=false; $('start').style.opacity=1; }
+    if(pref.e && pref.c){ $('start').disabled=false; }
   });
   $('start').onclick=function(){
-    i=0; seen=[]; $('intro').hidden=true; $('play').hidden=false; show();
+    i=0; seen=[]; busy=false;
+    $('progbar').style.width='0%';
+    $('intro').hidden=true; $('play').hidden=false; show();
   };
 
+  // Voting: highlight the pick, advance the bar, then show the next pair
   $('cands').addEventListener('click',function(e){
+    if(busy) return;
     var b=e.target.closest('button[data-idx]'); if(!b) return;
+    busy=true;
     var pick=+b.getAttribute('data-idx');
     cur.forEach(function(p,k){
       seen.push({econMatch:p.e===pref.e, cultMatch:p.c===pref.c, corrupt:!!p.corr, chosen:k===pick});
     });
-    i++; if(i<ROUNDS) show(); else finish();
+    $('cands').querySelectorAll('.cand').forEach(function(c,k){
+      c.classList.add(k===pick?'picked':'dim');
+    });
+    $('progbar').style.width=((i+1)/ROUNDS*100)+'%';
+    setTimeout(function(){
+      i++; busy=false;
+      if(i<ROUNDS) show(); else finish();
+    },380);
   });
 })();
+</script>
 </body>
 </html>
