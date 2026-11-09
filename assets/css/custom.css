@@ -154,3 +154,30 @@ border:0!important;font-family:var(--mono);font-size:.95em;transition:color .2s;
 .cur-ring{width:34px;height:34px;margin:-17px 0 0 -17px;border:1.5px solid var(--accent);
 transition:width .2s,height .2s,margin .2s,background .2s,opacity .2s;}
 .cur-ring.hot{width:54px;height:54px;margin:-27px 0 0 -27px;background:rgba(201,184,250,.4);}
+
+
+
+/* ===== Softer, dimmer background with dots ===== */
+
+:root{
+  --bg:#eceaf1;          /* soft grey-lilac instead of white */
+  --bg-alt:#e4e1ec;
+  --line:#d6d2e2;
+}
+
+/* Dots live on the page itself, so every section shows them */
+body{
+  background-color:var(--bg);
+  background-image:radial-gradient(rgba(67,40,156,.18) 1px,transparent 1px);
+  background-size:22px 22px;
+}
+.band{background:transparent;}
+.band.hero{background-image:none;}
+.band.alt{background:rgba(91,60,196,.06);}   /* faint tint, dots still show through */
+
+/* Nav: translucent, no white glare */
+#nav{background:rgba(236,234,241,.92)!important;border-bottom:1px solid var(--line);}
+
+/* Cards and boxes: soft off-white instead of pure white */
+.entry,.game,.cand,.chip{background:#f6f5f9;}
+.entry:hover,.cand:hover{background:var(--hover-soft);}
