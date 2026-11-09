@@ -160,9 +160,9 @@ transition:width .2s,height .2s,margin .2s,background .2s,opacity .2s;}
 /* ===== Softer, dimmer background with dots ===== */
 
 :root{
-  --bg:#eceaf1;          /* soft grey-lilac instead of white */
-  --bg-alt:#e4e1ec;
-  --line:#d6d2e2;
+  --bg: #f7f6f2;        /* warm off-white */
+  --bg-alt: #f0efe9;    /* slightly darker off-white */
+  --line: #deddd6;      /* soft neutral border */
 }
 
 /* Dots live on the page itself, so every section shows them */
